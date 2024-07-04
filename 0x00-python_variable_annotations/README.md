@@ -23,3 +23,8 @@ The project consists of several Python scripts, each demonstrating different asp
 
 - Python 3.7+
 - mypy
+
+### Advanced Tasks
+- `100-safe_first_element.py`: Function demonstrating duck-typed annotations
+- `101-safely_get_value.py`: Function with more complex type annotations using TypeVar
+- `102-type_checking.py`: Example of using mypy for type checking
