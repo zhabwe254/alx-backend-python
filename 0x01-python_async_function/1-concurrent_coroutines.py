@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
+
 import asyncio
-from typing import List
+from 1-concurrent_coroutines import wait_n
 
-from 0-basic_async_syntax import wait_random
-
-async def wait_n(n: int, max_delay: int) -> List[float]:
-    """
-    Spawn wait_random n times with the specified max_delay and return the list of delays.
-    """
-    tasks = [wait_random(max_delay) for _ in range(n)]
-    results = await asyncio.gather(*tasks)
-    return sorted(results)
+print(asyncio.run(wait_n(5, 5)))
+print(asyncio.run(wait_n(10, 7)))
+print(asyncio.run(wait_n(10, 0)))
