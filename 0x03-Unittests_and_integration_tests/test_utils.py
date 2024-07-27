@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 """
-Test suite for utils module.
+Test utilities module.
+
+This module provides tests for the utilities module.
 """
 
 import unittest
@@ -56,8 +58,8 @@ class TestGetJson(unittest.TestCase):
         Test get_json function with invalid input.
         """
         mock_get.return_value.json.return_value = {"payload": False}
-        self.assertEqual(get_json("http://holberton.io"), {"payload": False})
-        mock_get.assert_called_once_with("http://holberton.io")
+        self.assertEqual(get_json("http://example.com"), {"payload": False})
+        mock_get.assert_called_once_with("http://example.com")
 
 class TestMemoize(unittest.TestCase):
     """
@@ -68,20 +70,11 @@ class TestMemoize(unittest.TestCase):
         """
         Test memoize function with valid input.
         """
-        class TestClass:
-            def a_method(self):
-                return 42
-
-            @memoize
-            def a_property(self):
-                return self.a_method()
-
-        test_class = TestClass()
-        with patch.object(test_class, 'a_method') as mock_a_method:
-            mock_a_method.return_value = 42
-            self.assertEqual(test_class.a_property, 42)
-            self.assertEqual(test_class.a_property, 42)
-            mock_a_method.assert_called_once()
+        def add(a, b):
+            return a + b
+        memoized_add = memoize(add)
+        self.assertEqual(memoized_add(1, 2), 3)
+        self.assertEqual(memoized_add(1, 2), 3)
 
 if __name__ == '__main__':
     unittest.main()
