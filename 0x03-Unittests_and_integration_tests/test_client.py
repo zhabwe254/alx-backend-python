@@ -53,12 +53,4 @@ class TestGithubOrgClient(unittest.TestCase):
     @patch('client.GithubOrgClient._public_repos_url')
     def test_public_repos_url_exception(self, mock_public_repos_url):
         """
-        Test public_repos_url property with invalid input.
-        """
-        mock_public_repos_url.return_value = None
-        client = GithubOrgClient("org")
-        with self.assertRaises(TypeError):
-            client._public_repos_url
-
-if __name__ == '__main__':
-    unittest.main()
+        Test

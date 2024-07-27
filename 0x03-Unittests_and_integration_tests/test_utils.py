@@ -61,6 +61,15 @@ class TestGetJson(unittest.TestCase):
         self.assertEqual(get_json("http://example.com"), {"payload": False})
         mock_get.assert_called_once_with("http://example.com")
 
+    @patch('requests.get')
+    def test_get_json_exception(self, mock_get):
+        """
+        Test get_json function with exception.
+        """
+        mock_get.return_value.json.side_effect = Exception("Mocked exception")
+        with self.assertRaises(Exception):
+            get_json("http://example.com")
+
 class TestMemoize(unittest.TestCase):
     """
     Test case for memoize function.
@@ -75,6 +84,16 @@ class TestMemoize(unittest.TestCase):
         memoized_add = memoize(add)
         self.assertEqual(memoized_add(1, 2), 3)
         self.assertEqual(memoized_add(1, 2), 3)
+
+    def test_memoize_exception(self):
+        """
+        Test memoize function with exception.
+        """
+        def add(a, b):
+            raise Exception("Mocked exception")
+        memoized_add = memoize(add)
+        with self.assertRaises(Exception):
+            memoized_add(1, 2)
 
 if __name__ == '__main__':
     unittest.main()
