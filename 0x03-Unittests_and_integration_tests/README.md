@@ -44,3 +44,16 @@ Mocking a property
 More patching
 Parameterize
 Integration test: fixtures
+
+Coding Style
+This project follows the pycodestyle style guide. To check your code, you can run:
+bashCopypycodestyle *.py
+Documentation
+All modules, classes, and functions have appropriate docstrings. You can view them using Python's built-in help function or by running:
+bashCopypython3 -c 'print(__import__("utils").__doc__)'
+python3 -c 'print(__import__("utils").access_nested_map.__doc__)'
+python3 -c 'print(__import__("utils").get_json.__doc__)'
+python3 -c 'print(__import__("utils").memoize.__doc__)'
+
+Author
+Gideon Habwe
