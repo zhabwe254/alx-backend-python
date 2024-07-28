@@ -20,31 +20,34 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": {"b": 2}}, ("a", "b"), 2)
     ])
     def test_access_nested_map(self, nested_map: Mapping,
-                               path: Sequence, expected: int) -> None:
+                               path: Sequence, expected: Any) -> None:
         """
         Test the access_nested_map method.
         Args:
             nested_map (Dict): A dictionary that may have nested dictionaries
             path (List, tuple, set): Keys to get to the required value in the
                                      nested dictionary
+            expected: The expected result
         """
         response = access_nested_map(nested_map, path)
         self.assertEqual(response, expected)
 
     @parameterized.expand([
-        ({}, ("a",)),
-        ({"a": 1}, ("a", "b"))
+        ({}, ("a",), KeyError),
+        ({"a": 1}, ("a", "b"), KeyError)
     ])
     def test_access_nested_map_exception(self, nested_map: Mapping,
-                                         path: Sequence) -> None:
+                                         path: Sequence,
+                                         exception: Exception) -> None:
         """
         Test the access_nested_map method raises an error when expected to
         Args:
             nested_map (Dict): A dictionary that may have nested dictionaries
             path (List, tuple, set): Keys to get to the required value in the
                                      nested dictionary
+            exception: The expected exception
         """
-        with self.assertRaises(KeyError):
+        with self.assertRaises(exception):
             access_nested_map(nested_map, path)
 
 
@@ -61,8 +64,9 @@ class TestGetJson(unittest.TestCase):
         """
         Test the get_json method to ensure it returns the expected output.
         Args:
-            url: url to send http request to
-            payload: expected json response
+            test_url: url to send http request to
+            test_payload: expected json response
+            mock_requests_get: mocked requests.get function
         """
         mock_requests_get.return_value.json.return_value = test_payload
         result = get_json(test_url)
