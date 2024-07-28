@@ -1,56 +1,97 @@
 #!/usr/bin/env python3
-
 """
-Test client module.
-
-This module provides tests for the client module.
+Test for access_nested_map function
 """
-
 import unittest
+import requests
+from unittest.mock import patch
+from utils import access_nested_map, get_json, memoize
+from typing import Mapping, Sequence, Any
 from parameterized import parameterized
-from unittest.mock import patch, Mock
-from client import GithubOrgClient
-from fixtures import load_fixture
 
-class TestGithubOrgClient(unittest.TestCase):
+
+class TestAccessNestedMap(unittest.TestCase):
     """
-    Test case for GithubOrgClient class.
+    Tests the access_nested_map function
     """
+    @parameterized.expand([
+        ({"a": 1}, ("a",), 1),
+        ({"a": {"b": 2}}, ("a",), {"b": 2}),
+        ({"a": {"b": 2}}, ("a", "b"), 2)
+    ])
+    def test_access_nested_map(self, nested_map: Mapping,
+                               path: Sequence, expected: int) -> None:
+        """
+        Test the access_nested_map method.
+        Args:
+            nested_map (Dict): A dictionary that may have nested dictionaries
+            path (List, tuple, set): Keys to get to the required value in the
+                                     nested dictionary
+        """
+        response = access_nested_map(nested_map, path)
+        self.assertEqual(response, expected)
 
     @parameterized.expand([
-        ("google", "google.json"),
-        ("facebook", "facebook.json"),
+        ({}, ("a",)),
+        ({"a": 1}, ("a", "b"))
     ])
-    def test_public_repos(self, org, fixture_name):
+    def test_access_nested_map_exception(self, nested_map: Mapping,
+                                         path: Sequence) -> None:
         """
-        Test public_repos property with valid inputs.
+        Test the access_nested_map method raises an error when expected to
+        Args:
+            nested_map (Dict): A dictionary that may have nested dictionaries
+            path (List, tuple, set): Keys to get to the required value in the
+                                     nested dictionary
         """
-        client = GithubOrgClient(org)
-        expected = load_fixture(fixture_name)
-        self.assertEqual(client.public_repos, expected)
+        with self.assertRaises(KeyError):
+            access_nested_map(nested_map, path)
 
+
+class TestGetJson(unittest.TestCase):
+    """
+    Test the get_json function
+    """
     @parameterized.expand([
-        ({"license": {"key": "my_license"}}, "my_license", True),
-        ({"license": {"key": "other_license"}}, "my_license", False),
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False})
     ])
-    def test_has_license(self, repo, license_key, expected):
+    @patch("requests.get")
+    def test_get_json(self, test_url, test_payload, mock_requests_get):
         """
-        Test has_license method with valid inputs.
+        Test the get_json method to ensure it returns the expected output.
+        Args:
+            url: url to send http request to
+            payload: expected json response
         """
-        client = GithubOrgClient("org")
-        self.assertEqual(client.has_license(repo, license_key), expected)
+        mock_requests_get.return_value.json.return_value = test_payload
+        result = get_json(test_url)
+        self.assertEqual(result, test_payload)
+        mock_requests_get.assert_called_once_with(test_url)
 
-    @patch('client.get_json')
-    def test_public_repos_exception(self, mock_get_json):
-        """
-        Test public_repos property with invalid input.
-        """
-        mock_get_json.return_value = None
-        client = GithubOrgClient("org")
-        with self.assertRaises(TypeError):
-            client.public_repos
 
-    @patch('client.GithubOrgClient._public_repos_url')
-    def test_public_repos_url_exception(self, mock_public_repos_url):
+class TestMemoize(unittest.TestCase):
+    """
+    Test the memoization decorator, memoize
+    """
+    def test_memoize(self):
         """
-        Test
+        Test that utils.memoize decorator works as intended
+        """
+        class TestClass:
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+
+        with patch.object(TestClass, 'a_method') as mock_object:
+            test = TestClass()
+            test.a_property()
+            test.a_property()
+            mock_object.assert_called_once()
+
+
+if __name__ == '__main__':
+    unittest.main()
